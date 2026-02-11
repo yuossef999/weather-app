@@ -34,5 +34,37 @@ def weather():
     current = w.get("current_weather", {})
     return render_template("weather.html", city=city, current=current)
 
+@app.route("/forecast", methods=["POST"])
+def forecast():
+    city = request.form.get("city", "").strip()
+    if not city:
+        return render_template("error.html", message="City is required")
+
+    geo = requests.get(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        params={"name": city, "count": 1, "language": "en", "format": "json"},
+        timeout=10
+    ).json()
+
+    if "results" not in geo or not geo["results"]:
+        return render_template("error.html", message="City not found")
+
+    lat = geo["results"][0]["latitude"]
+    lon = geo["results"][0]["longitude"]
+
+    w = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={
+            "latitude": lat,
+            "longitude": lon,
+            "daily": "temperature_2m_max,temperature_2m_min",
+            "timezone": "auto"
+        },
+        timeout=10
+    ).json()
+
+    daily = w.get("daily", {})
+    return render_template("forecast.html", city=city, daily=daily)
+
 if __name__ == "__main__":
     app.run(debug=True)

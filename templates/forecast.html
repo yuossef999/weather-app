@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>7-Day Forecast for {{ city }}</h2>
+    <ul>
+      {% for i in range(daily.get("time", [])|length) %}
+        <li>
+          {{ daily["time"][i] }} :
+          max {{ daily["temperature_2m_max"][i] }}°C /
+          min {{ daily["temperature_2m_min"][i] }}°C
+        </li>
+      {% endfor %}
+    </ul>
+    <a href="/">Back</a>
+  </body>
+</html>

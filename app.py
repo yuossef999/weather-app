@@ -3,9 +3,11 @@ import requests
 
 app = Flask(__name__)
 
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
+
 
 @app.route("/weather", methods=["POST"])
 def weather():
@@ -16,7 +18,7 @@ def weather():
     geo = requests.get(
         "https://geocoding-api.open-meteo.com/v1/search",
         params={"name": city, "count": 1, "language": "en", "format": "json"},
-        timeout=10
+        timeout=10,
     ).json()
 
     if "results" not in geo or not geo["results"]:
@@ -28,11 +30,12 @@ def weather():
     w = requests.get(
         "https://api.open-meteo.com/v1/forecast",
         params={"latitude": lat, "longitude": lon, "current_weather": True},
-        timeout=10
+        timeout=10,
     ).json()
 
     current = w.get("current_weather", {})
     return render_template("weather.html", city=city, current=current)
+
 
 @app.route("/forecast", methods=["POST"])
 def forecast():
@@ -43,7 +46,7 @@ def forecast():
     geo = requests.get(
         "https://geocoding-api.open-meteo.com/v1/search",
         params={"name": city, "count": 1, "language": "en", "format": "json"},
-        timeout=10
+        timeout=10,
     ).json()
 
     if "results" not in geo or not geo["results"]:
@@ -58,13 +61,14 @@ def forecast():
             "latitude": lat,
             "longitude": lon,
             "daily": "temperature_2m_max,temperature_2m_min",
-            "timezone": "auto"
+            "timezone": "auto",
         },
-        timeout=10
+        timeout=10,
     ).json()
 
     daily = w.get("daily", {})
     return render_template("forecast.html", city=city, daily=daily)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
